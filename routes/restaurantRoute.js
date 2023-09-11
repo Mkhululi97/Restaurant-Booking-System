@@ -1,7 +1,6 @@
 export default function RestaurantRoute(factoryFunc, dbFunc) {
   async function home(req, res) {
     try {
-      // console.log(await dbFunc.getTables());
       res.render("index", { tables: await dbFunc.getTables() });
     } catch (err) {
       console.log(err);

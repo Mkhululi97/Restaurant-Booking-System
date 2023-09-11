@@ -12,7 +12,9 @@ export default function dbFactoryFunc(db) {
     number_of_people,
     contact_number,
     table_id,
-    customerTables;
+    customerTables,
+    table_nameObj,
+    table_name;
   async function bookTable(tableName) {
     // get number of people in booking from the frontend
     number_of_people = tableName["people"];
@@ -42,15 +44,26 @@ export default function dbFactoryFunc(db) {
           "select capacity from table_bookings where id = $1",
           [table_id]
         );
+        // get the current table name for the current user
+        table_nameObj = await db.oneOrNone(
+          "select table_name from table_bookings where id = $1",
+          [table_id]
+        );
         capacity = capacityObj["capacity"];
-        console.log(tableName);
+        table_name = table_nameObj["table_name"];
         //book the table for the customer only if there're less people than
         // the tables capacity
         if (tableName["people"] < capacity) {
-          //   return "capacity greater than the table seats";
           await db.none(
-            "insert into customers (username, number_of_people, contact_number, table_id) values($1,$2,$3,$4)",
-            [username, number_of_people, contact_number, table_id]
+            "insert into customers (username, number_of_people, contact_number, table_id, table_name, capacity) values($1,$2,$3,$4,$5,$6)",
+            [
+              username,
+              number_of_people,
+              contact_number,
+              table_id,
+              table_name,
+              capacity,
+            ]
           );
         }
       }
